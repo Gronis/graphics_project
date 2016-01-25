@@ -16,10 +16,10 @@ namespace engine {
             GLuint ref_;
         };
         
-        class Program {
+        class ShaderProgram {
         public:
-            Program(const std::vector<Shader>& shaders);
-            ~Program();
+            ShaderProgram(std::initializer_list<Shader> shaders);
+            ~ShaderProgram();
             
             GLuint ref() const;
             void use() const;
@@ -68,8 +68,8 @@ void setUniform4v(const GLchar* uniformName, const OGL_TYPE* v, GLsizei count=1)
             GLuint ref_;
             
             //copying disabled
-            Program(const Program&) = delete;
-            const Program& operator=(const Program&) = delete;
+            ShaderProgram(const ShaderProgram &) = delete;
+            const ShaderProgram & operator=(const ShaderProgram &) = delete;
         };
     }
 }

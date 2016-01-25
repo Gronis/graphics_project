@@ -15,13 +15,7 @@ namespace engine {
         
         while (running_) {
             timeBefore = timestamp();
-            bool all_windows_closed = false;
-            for (auto window : manager<gfx::Window>()) {
-                window->update(dt);
-                window->render(dt, manager<gfx::Mesh>(), manager<gfx::Renderer>());
-                all_windows_closed |= window->closed();
-            }
-            running_ = !all_windows_closed;
+            running_ = update_function_(dt);
             timeAfter = timestamp();
             waitForSleepyUpdate(timeBefore, timeAfter, &extendedTime, &dt);
         }

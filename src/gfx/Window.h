@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 
 #include "util/Manager.h"
-#include "Mesh.h"
 #include "Renderer.h"
 
 namespace engine{
@@ -19,29 +18,29 @@ namespace engine{
             
             void close();
             void update(double dt);
-            void render(double dt, util::Manager<Mesh> &meshes, util::Manager<Renderer> &renderers);
+            void render(double dt, std::vector<Model> &model, std::vector<Renderer> &renderers);
             
-            inline int x(){return _x; }
-            inline int y(){return _y; }
+            inline int x(){return x_; }
+            inline int y(){return y_; }
             inline int width(){ return width_; }
             inline int height(){ return height_; }
             inline float ratio(){ return width() / (float) height(); }
-            inline bool closed(){ return _closed;}
+            inline bool closed(){ return closed_;}
             inline glm::mat4 camera() { return camera_; }
             inline void camera(glm::mat4 camera) { camera_ = camera; }
             inline glm::mat4 projection() { return projection_; }
             inline void projection(glm::mat4 projection) { projection_ = projection; }
             
         private:
-            int _y;
-            int _x;
+            int y_;
+            int x_;
             int width_;
             int height_;
-            bool _focused;
-            bool _closed = false;
+            bool focused_ = false;
+            bool closed_ = false;
             
-            bool _use_virtual_sync;
-            bool _fullscreen;
+            bool use_virtual_sync_;
+            bool fullscreen_;
             
             glm::mat4 camera_;
             glm::mat4 projection_;

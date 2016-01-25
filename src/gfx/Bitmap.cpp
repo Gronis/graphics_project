@@ -312,14 +312,3 @@ void Bitmap::set_(unsigned width,
         memcpy(pixels_, pixels, newSize);
     }
 }
-
-
-
-
-
-
-
-
-
-
-

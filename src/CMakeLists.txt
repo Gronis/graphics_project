@@ -6,7 +6,7 @@ macro(ADD_FRAMEWORK fwname appname)
     target_link_libraries( ${appname} ${${fwname}_LIBRARY} )
 endmacro(ADD_FRAMEWORK)
 
-add_executable( ${PROJ_NAME} ${PROJ_SOURCES} ${PROJ_HEADERS} )
+add_executable( ${PROJ_NAME} ${PROJ_SOURCES} ${PROJ_HEADERS})
 target_link_libraries( ${PROJ_NAME} ${GLFW_LIB_PATH} ${GLEW_LIB_PATH} )
 
 # Buildrule, copy the res map to build dir

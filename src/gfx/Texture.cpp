@@ -1,7 +1,10 @@
 #include "Texture.h"
 #include <stdexcept>
+#include <bitset>
 
 using namespace engine::gfx;
+
+GLuint Texture::active_texture_unit_ = 0;
 
 static GLenum TextureFormatForBitmapFormat(Bitmap::Format format)
 {
@@ -15,9 +18,8 @@ static GLenum TextureFormatForBitmapFormat(Bitmap::Format format)
 }
 
 Texture::Texture(const Bitmap& bitmap, GLint minMagFiler, GLint wrapMode) :
-width_((GLfloat)bitmap.width()),
-height_((GLfloat)bitmap.height())
-{
+  width_((GLfloat)bitmap.width()),
+  height_((GLfloat)bitmap.height()) {
     glGenTextures(1, &ref_);
     glBindTexture(GL_TEXTURE_2D, ref_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minMagFiler);
@@ -36,9 +38,18 @@ height_((GLfloat)bitmap.height())
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::~Texture()
-{
+Texture::~Texture() {
     glDeleteTextures(1, &ref_);
+}
+
+GLuint Texture::bind() {
+  GLuint used_texture_unit = active_texture_unit_;
+  GLint max_tex_units;
+  glGetIntegerv(GL_MAX_TEXTURE_UNITS, &max_tex_units);
+  glActiveTexture(GL_TEXTURE0 + active_texture_unit_++);
+  glBindTexture(GL_TEXTURE_2D, ref());
+  active_texture_unit_ %= max_tex_units;
+  return used_texture_unit;
 }
 
 GLuint Texture::ref() const

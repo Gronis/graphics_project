@@ -3,21 +3,21 @@
 #include <GL/glew.h>
 
 #include "Shader.h"
-#include "Mesh.h"
+#include "Model.h"
 
 namespace engine {
     namespace gfx{
         class Window;
         class Renderer {
         public:
-            Renderer(Program& program);
+            Renderer(ShaderProgram & program);
             
             void use();
             void stopUsing();
-            void render(float dt, Window& window, Mesh& mesh);
+            void render(float dt, Window& window, Model& model);
             
         private:
-            Program& program_;
+            ShaderProgram & program_;
         };
     }
 }
