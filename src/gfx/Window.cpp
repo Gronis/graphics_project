@@ -47,8 +47,12 @@ Window::Window(const char *title, int width, int height, bool use_virtual_sync, 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  camera(glm::lookAt(glm::vec3(190, 100, 0), glm::vec3(0, 150, 0), glm::vec3(0, 1, 0)));
-  projection(glm::perspective(glm::radians(50.0f), ((float) width_) / ((float) height_), 50.0f, 10000.0f));
+  camera_position_ = glm::vec3(190, 100, 0);
+  camera_direction_ = glm::vec3(0, 0, 1);
+  resize(width, height);
+
+  //setup event handlers
+  glfwSetWindowSizeCallback(window_, &resize_);
 }
 
 Window::~Window() { }
@@ -58,11 +62,8 @@ void Window::close() {
 }
 
 void Window::update(double dt) {
-  camera_ = glm::rotate(camera_, 0.2f * (float)dt , glm::vec3(0.0f, 0.1f, 0.0f));
-  glfwPollEvents();
-  if (glfwWindowShouldClose(window_)) {
-    closed_ = true;
-  }
+  handle_input();
+  camera(glm::lookAt(camera_position_, camera_position_ + camera_direction_, glm::vec3(0, 1, 0)));
 }
 void Window::render(double dt, std::vector<Model> &models, std::vector<Renderer> &renderers) {
   glClearColor(0, 0, 0, 1); // black
@@ -78,4 +79,58 @@ void Window::render(double dt, std::vector<Model> &models, std::vector<Renderer>
   }
 
   glfwSwapBuffers(window_);
+}
+
+void Window::resize_(GLFWwindow* window, int width, int height) {
+  static_cast<Window*>(glfwGetWindowUserPointer(window))->resize(width, height);
+}
+
+void Window::resize(int width, int height) {
+  width_ = width;
+  height_ = height;
+  projection(glm::perspective(glm::radians(50.0f), ((float) width_) / ((float) height_), 10.0f, 10000.0f));
+}
+
+void Window::handle_input() {
+  double x_pos, y_pos;
+  glfwPollEvents();
+  glfwGetCursorPos(window_, &x_pos, &y_pos);
+  glm::vec3 y_rotation_axis = glm::normalize(glm::cross(camera_direction_ , glm::vec3(0,-1,0)));
+  glm::vec3 x_rotation_axis = glm::normalize(glm::cross(y_rotation_axis, camera_direction_));
+
+  if(glfwGetKey(window_, GLFW_KEY_W) == GLFW_PRESS){
+    camera_position_ += camera_direction_ * 10.0f;
+  }
+
+  if(glfwGetKey(window_, GLFW_KEY_S) == GLFW_PRESS){
+    camera_position_ -= camera_direction_ * 10.0f;
+  }
+
+  if(glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS){
+    camera_position_ -= y_rotation_axis * 10.0f;
+  }
+
+  if(glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS){
+    camera_position_ += y_rotation_axis * 10.0f;
+  }
+
+  if(glfwGetKey(window_, GLFW_KEY_E) == GLFW_PRESS){
+    camera_position_ += glm::vec3(0, 1, 0) * 10.0f;
+  }
+
+  if(glfwGetKey(window_, GLFW_KEY_Q) == GLFW_PRESS){
+    camera_position_ -= glm::vec3(0, 1, 0) * 10.0f;
+  }
+
+  if(glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_1)){
+    glm::vec4 res = glm::rotate(glm::rotate(glm::mat4(), (float)((y_pos - y_pos_last_) * M_PI/1000), y_rotation_axis),
+                                                         (float)((x_pos - x_pos_last_) * M_PI/1000), x_rotation_axis)
+                                                          * glm::vec4(camera_direction_, 1);
+    camera_direction_ = glm::vec3(res.x, res.y, res.z);
+  }
+  x_pos_last_ = x_pos;
+  y_pos_last_ = y_pos;
+  if (glfwWindowShouldClose(window_)) {
+    closed_ = true;
+  }
 }

@@ -33,10 +33,10 @@ int main() {
   std::vector<Model> models = { model };
 
   Engine engine([&window, &models, &renderers](float dt) {
-      window.update(dt);
-      window.render(dt, models, renderers);
-      return !window.closed();
-    });
+    window.update(dt);
+    window.render(dt, models, renderers);
+    return !window.closed();
+  });
 
 
   // print out some info about the graphics drivers
