@@ -34,7 +34,7 @@ class Window {
 
  private:
 
-  void handle_input();
+  void handle_input(float dt);
 
   static void resize_(GLFWwindow* window, int width, int height);
   void resize(int width, int height);
@@ -54,7 +54,9 @@ class Window {
   double y_pos_last_;
 
   glm::vec3 camera_position_;
+  glm::vec3 camera_position_pref;
   glm::vec3 camera_direction_;
+  glm::vec3 camera_direction_pref;
 
   glm::mat4 camera_;
   glm::mat4 projection_;

@@ -48,8 +48,8 @@ Window::Window(const char *title, int width, int height, bool use_virtual_sync, 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  camera_position_ = glm::vec3(190, 100, 0);
-  camera_direction_ = glm::vec3(0, 0, 1);
+  camera_position_ = camera_position_pref = glm::vec3(190, 100, 0);
+  camera_direction_ = camera_direction_pref = glm::vec3(0, 0, 1);
   resize(width, height);
 
   //setup event handlers
@@ -63,7 +63,7 @@ void Window::close() {
 }
 
 void Window::update(double dt) {
-  handle_input();
+  handle_input(dt);
   camera(glm::lookAt(camera_position_, camera_position_ + camera_direction_, glm::vec3(0, 1, 0)));
 }
 void Window::render(double dt, ecs::EntityManager& entities, std::vector<Renderer> &renderers) {
@@ -93,7 +93,8 @@ void Window::resize(int width, int height) {
   projection(glm::perspective(glm::radians(50.0f), ((float) width_) / ((float) height_), 10.0f, 10000.0f));
 }
 
-void Window::handle_input() {
+void Window::handle_input(float dt) {
+  constexpr float DIR_BLEND = 0.6f, POS_BLEND = 0.8f, SPEED = 500;
   double x_pos, y_pos;
   glfwPollEvents();
   glfwGetCursorPos(window_, &x_pos, &y_pos);
@@ -101,35 +102,43 @@ void Window::handle_input() {
   glm::vec3 x_rotation_axis = glm::normalize(glm::cross(y_rotation_axis, camera_direction_));
 
   if(glfwGetKey(window_, GLFW_KEY_W) == GLFW_PRESS){
-    camera_position_ += camera_direction_ * 10.0f;
+    camera_position_pref += camera_direction_ * SPEED * dt;
   }
 
   if(glfwGetKey(window_, GLFW_KEY_S) == GLFW_PRESS){
-    camera_position_ -= camera_direction_ * 10.0f;
+    camera_position_pref -= camera_direction_ * SPEED * dt;;
   }
 
   if(glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS){
-    camera_position_ -= y_rotation_axis * 10.0f;
+    camera_position_pref -= y_rotation_axis * SPEED * dt;;
   }
 
   if(glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS){
-    camera_position_ += y_rotation_axis * 10.0f;
+    camera_position_pref += y_rotation_axis * SPEED * dt;;
   }
 
   if(glfwGetKey(window_, GLFW_KEY_E) == GLFW_PRESS){
-    camera_position_ += glm::vec3(0, 1, 0) * 10.0f;
+    camera_position_pref += glm::vec3(0, 1, 0) * SPEED * dt;;
   }
 
   if(glfwGetKey(window_, GLFW_KEY_Q) == GLFW_PRESS){
-    camera_position_ -= glm::vec3(0, 1, 0) * 10.0f;
+    camera_position_pref -= glm::vec3(0, 1, 0) * SPEED * dt;;
   }
+  camera_position_ = camera_position_ * POS_BLEND + (1 - POS_BLEND) * camera_position_pref;
+
+
 
   if(glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_1)){
-    glm::vec4 res = glm::rotate(glm::rotate(glm::mat4(), (float)((y_pos - y_pos_last_) * M_PI/1000), y_rotation_axis),
-                                                         (float)((x_pos - x_pos_last_) * M_PI/1000), x_rotation_axis)
-                                                          * glm::vec4(camera_direction_, 1);
-    camera_direction_ = glm::vec3(res.x, res.y, res.z);
+    glm::vec4 res = glm::rotate(glm::rotate(glm::mat4(), (float)((x_pos - x_pos_last_) * M_PI/1000), x_rotation_axis),
+                                                         (float)((y_pos - y_pos_last_) * M_PI/1000), y_rotation_axis)
+                                                          * glm::vec4(camera_direction_pref, 0);
+    camera_direction_pref = glm::vec3(res.x, res.y, res.z);
+    camera_direction_ = camera_direction_ * DIR_BLEND + (1 - DIR_BLEND) * camera_direction_pref;
   }
+  camera_direction_ = glm::normalize(camera_direction_);
+  if(camera_direction_.y >  0.8f)  camera_direction_.y =  0.8f;
+  if(camera_direction_.y < -0.8f)  camera_direction_.y = -0.8f;
+  camera_direction_ = glm::normalize(camera_direction_);
   x_pos_last_ = x_pos;
   y_pos_last_ = y_pos;
   if (glfwWindowShouldClose(window_)) {

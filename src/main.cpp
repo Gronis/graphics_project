@@ -48,23 +48,6 @@ int main() {
   e.get<Model>().genVertexArrayObject(program);
   e.add<RotationVelocity>(0,1,0);
 
-  /*
-  e = entities.create<Renderable>(glm::vec3(0,0,0),
-                                       glm::vec3(0,0,0),
-                                       glm::vec3(1,1,1),
-                                       resource.load<Model>("res/crytek-sponza/sponza.obj"));
-  e.get<Model>().genVertexArrayObject(program);
-
-
-
-
-  e = entities.create<Renderable>(glm::vec3(3200,150,0),
-                                  glm::vec3(0,0,0),
-                                  glm::vec3(100,100,100),
-                                  resource.load<Model>("res/dragon2.obj"));
-  e.get<Model>().genVertexArrayObject(program);
-  e.add<RotationVelocity>(0,1,0);
-*/
   e = entities.create<Renderable>(glm::vec3(0,0,0),
                                   glm::vec3(0,0,0),
                                   glm::vec3(50,50,50),
