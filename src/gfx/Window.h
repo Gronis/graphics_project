@@ -27,6 +27,7 @@ class Window {
   inline int height() { return height_; }
   inline float ratio() { return width() / (float) height(); }
   inline bool closed() { return closed_; }
+  inline bool focused() { return focused_; }
   inline glm::mat4 camera() { return camera_; }
   inline void camera(glm::mat4 camera) { camera_ = camera; }
   inline glm::mat4 projection() { return projection_; }
@@ -38,6 +39,9 @@ class Window {
 
   static void resize_(GLFWwindow* window, int width, int height);
   void resize(int width, int height);
+
+  static void focus_(GLFWwindow* window, int focused);
+  void focus(bool focused);
 
 
   int y_;

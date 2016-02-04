@@ -61,6 +61,7 @@ int main() {
     });
     window.update(dt);
     window.render(dt, entities, renderers);
+    engine.sleeping(!window.focused());
     return !window.closed();
   });
 

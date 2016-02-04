@@ -54,6 +54,8 @@ Window::Window(const char *title, int width, int height, bool use_virtual_sync, 
 
   //setup event handlers
   glfwSetWindowSizeCallback(window_, &resize_);
+
+  glfwSetWindowFocusCallback(window_, &focus_);
 }
 
 Window::~Window() { }
@@ -91,6 +93,13 @@ void Window::resize(int width, int height) {
   width_ = width;
   height_ = height;
   projection(glm::perspective(glm::radians(50.0f), ((float) width_) / ((float) height_), 10.0f, 10000.0f));
+}
+
+void Window::focus_(GLFWwindow *window, int focused) {
+  static_cast<Window*>(glfwGetWindowUserPointer(window))->focus(focused == GL_TRUE);
+}
+void Window::focus(bool focused) {
+  focused_ = focused;
 }
 
 void Window::handle_input(float dt) {
