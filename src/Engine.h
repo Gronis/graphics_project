@@ -12,7 +12,7 @@ namespace engine {
     private:
         bool running_ = false;
         bool sleeping_ = false;
-        int updates_per_second_when_sleeping_ = 24;
+        int updates_per_second_when_sleeping_ = 60;
         thread update_thread_;
         UpdateFunction update_function_;
         

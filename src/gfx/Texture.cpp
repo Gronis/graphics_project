@@ -20,26 +20,31 @@ static GLenum TextureFormatForBitmapFormat(Bitmap::Format format)
 Texture::Texture(const Bitmap& bitmap, GLint minMagFiler, GLint wrapMode) :
   width_((GLfloat)bitmap.width()),
   height_((GLfloat)bitmap.height()) {
-    glGenTextures(1, &ref_);
-    glBindTexture(GL_TEXTURE_2D, ref_);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minMagFiler);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, minMagFiler);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 TextureFormatForBitmapFormat(bitmap.format()),
-                 (GLsizei)bitmap.width(),
-                 (GLsizei)bitmap.height(),
-                 0,
-                 TextureFormatForBitmapFormat(bitmap.format()),
-                 GL_UNSIGNED_BYTE,
-                 bitmap.pixelBuffer());
-    glBindTexture(GL_TEXTURE_2D, 0);
+  glGenTextures(1, &ref_);
+  glBindTexture(GL_TEXTURE_2D, ref_);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minMagFiler);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, minMagFiler);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+  glTexImage2D(GL_TEXTURE_2D,
+               0,
+               TextureFormatForBitmapFormat(bitmap.format()),
+               (GLsizei)bitmap.width(),
+               (GLsizei)bitmap.height(),
+               0,
+               TextureFormatForBitmapFormat(bitmap.format()),
+               GL_UNSIGNED_BYTE,
+               bitmap.pixelBuffer());
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+Texture::Texture(){
 }
 
 Texture::~Texture() {
+  if(ref_ != 0){
     glDeleteTextures(1, &ref_);
+  }
 }
 
 GLuint Texture::bind() {
@@ -65,4 +70,17 @@ GLfloat Texture::width() const
 GLfloat Texture::height() const
 {
     return height_;
+}
+
+Texture::Texture(Texture &&texture) :
+  ref_(texture.ref_),
+  width_(texture.width_),
+  height_(texture.height_){
+}
+Texture &Texture::operator=(Texture &&texture) {
+  glDeleteTextures(1, &ref_);
+  ref_ = texture.ref_;
+  width_ = texture.width_;
+  height_ = texture.height_;
+  return *this;
 }

@@ -14,7 +14,7 @@ namespace engine {
             
             void use();
             void stopUsing();
-            void render(float dt, Window& window, Model& model);
+            void render(float dt, Window& window,glm::vec3& pos, glm::vec3& rot, glm::vec3& sca, Model& model);
             
         private:
             ShaderProgram & program_;

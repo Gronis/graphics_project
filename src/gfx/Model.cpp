@@ -59,9 +59,10 @@ void Model::calculate_normals() {
 
 }
 
-Model::Model(std::vector<tinyobj::shape_t> shapes, std::vector<tinyobj::material_t> materials) :
+Model::Model(std::vector<tinyobj::shape_t> shapes, std::vector<tinyobj::material_t> materials, std::vector<Material> materials_ref) :
   shapes_(shapes),
-  materials_(materials) {
+  materials_(materials),
+  materials_ref_(materials_ref){
   calculate_normals();
 }
 

@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <thirdparty/ecs.h>
 
 #include "util/Manager.h"
 #include "Renderer.h"
@@ -18,7 +19,7 @@ class Window {
 
   void close();
   void update(double dt);
-  void render(double dt, std::vector<Model> &model, std::vector<Renderer> &renderers);
+  void render(double dt, ecs::EntityManager& entities, std::vector<Renderer> &renderers);
 
   inline int x() { return x_; }
   inline int y() { return y_; }

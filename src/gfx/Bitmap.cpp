@@ -82,9 +82,9 @@ typedef void(*FormatConverterFunc)(unsigned char*, unsigned char*);
 static FormatConverterFunc ConverterFuncForFormats(Bitmap::Format srcFormat, Bitmap::Format destFormat){
     if(srcFormat == destFormat)
         throw std::runtime_error("Just use memcpy if pixel formats are the same");
-    
+
     switch(srcFormat){
-            
+
         case Bitmap::Format_Grayscale:
             switch(destFormat){
                 case Bitmap::Format_GrayscaleAlpha: return grayToGrayAlpha;
@@ -94,7 +94,7 @@ static FormatConverterFunc ConverterFuncForFormats(Bitmap::Format srcFormat, Bit
                     throw std::runtime_error("Unhandled bitmap format");
             }
             break;
-            
+
         case Bitmap::Format_GrayscaleAlpha:
             switch(destFormat){
                 case Bitmap::Format_Grayscale: return grayAlphaToGray;
@@ -104,7 +104,7 @@ static FormatConverterFunc ConverterFuncForFormats(Bitmap::Format srcFormat, Bit
                     throw std::runtime_error("Unhandled bitmap format");
             }
             break;
-            
+
         case Bitmap::Format_RGB:
             switch(destFormat){
                 case Bitmap::Format_Grayscale:      return RGBToGray;
@@ -114,7 +114,7 @@ static FormatConverterFunc ConverterFuncForFormats(Bitmap::Format srcFormat, Bit
                     throw std::runtime_error("Unhandled bitmap format");
             }
             break;
-            
+
         case Bitmap::Format_RGBA:
             switch(destFormat){
                 case Bitmap::Format_Grayscale:      return RGBAToGray;
@@ -124,7 +124,7 @@ static FormatConverterFunc ConverterFuncForFormats(Bitmap::Format srcFormat, Bit
                     throw std::runtime_error("Unhandled bitmap format");
             }
             break;
-            
+
         default:
             throw std::runtime_error("Unhandled bitmap format");
     }
@@ -143,11 +143,11 @@ inline bool RectsOverlap(unsigned srcCol, unsigned srcRow, unsigned destCol, uns
     unsigned colDiff = srcCol > destCol ? srcCol - destCol : destCol - srcCol;
     if(colDiff < width)
         return true;
-    
+
     unsigned rowDiff = srcRow > destRow ? srcRow - destRow : destRow - srcRow;
     if(rowDiff < height)
         return true;
-    
+
     return false;
 }
 
@@ -165,6 +165,8 @@ pixels_(NULL)
     set_(width, height, format, pixels);
     flipVertically();
 }
+
+Bitmap::Bitmap() : Bitmap(0,0,Format_Grayscale){}
 
 Bitmap::~Bitmap() {
     if(pixels_) free(pixels_);
@@ -200,7 +202,7 @@ unsigned char* Bitmap::pixelBuffer() const {
 unsigned char* Bitmap::getPixel(unsigned int column, unsigned int row) const {
     if(column >= width_ || row >= height_)
         throw std::runtime_error("Pixel coordinate out of bounds");
-    
+
     return pixels_ + GetPixelOffset(column, row, width_, height_, format_);
 }
 
@@ -213,22 +215,22 @@ void Bitmap::flipVertically() {
     unsigned long rowSize = format_*width_;
     unsigned char* rowBuffer = new unsigned char[rowSize];
     unsigned halfRows = height_ / 2;
-    
+
     for(unsigned rowIdx = 0; rowIdx < halfRows; ++rowIdx){
         unsigned char* row = pixels_ + GetPixelOffset(0, rowIdx, width_, height_, format_);
         unsigned char* oppositeRow = pixels_ + GetPixelOffset(0, height_ - rowIdx - 1, width_, height_, format_);
-        
+
         memcpy(rowBuffer, row, rowSize);
         memcpy(row, oppositeRow, rowSize);
         memcpy(oppositeRow, rowBuffer, rowSize);
     }
-    
+
     delete rowBuffer;
 }
 
 void Bitmap::rotate90CounterClockwise() {
     unsigned char* newPixels = (unsigned char*) malloc(format_*width_*height_);
-    
+
     for(unsigned row = 0; row < height_; ++row){
         for(unsigned col = 0; col < width_; ++col){
             unsigned srcOffset = GetPixelOffset(col, row, width_, height_, format_);
@@ -236,10 +238,10 @@ void Bitmap::rotate90CounterClockwise() {
             memcpy(newPixels + destOffset, pixels_ + srcOffset, format_); //copy one pixel
         }
     }
-    
+
     free(pixels_);
     pixels_ = newPixels;
-    
+
     unsigned swapTmp = height_;
     height_ = width_;
     width_ = swapTmp;
@@ -257,7 +259,7 @@ void Bitmap::copyRectFromBitmap(const Bitmap& src,
         width = src.width();
         height = src.height();
     }
-    
+
     if(width == 0 || height == 0){
         throw std::runtime_error("Can't copy zero height/width rectangle");
     }
@@ -278,7 +280,7 @@ void Bitmap::copyRectFromBitmap(const Bitmap& src,
         for(unsigned col = 0; col < width; ++col){
             unsigned char* srcPixel = src.pixels_ + GetPixelOffset(srcCol + col, srcRow + row, src.width_, src.height_, src.format_);
             unsigned char* destPixel = pixels_ + GetPixelOffset(destCol + col, destRow + row, width_, height_, format_);
-            
+
             if(converter){
                 converter(srcPixel, destPixel);
             } else {
@@ -296,18 +298,18 @@ void Bitmap::set_(unsigned width,
     if(width == 0) throw std::runtime_error("Zero width bitmap");
     if(height == 0) throw std::runtime_error("Zero height bitmap");
     if(format <= 0 || format > 4) throw std::runtime_error("Invalid bitmap format");
-    
+
     width_ = width;
     height_ = height;
     format_ = format;
-    
+
     size_t newSize = width_ * height_ * format_;
     if(pixels_){
         pixels_ = (unsigned char*)realloc(pixels_, newSize);
     } else {
         pixels_ = (unsigned char*)malloc(newSize);
     }
-    
+
     if(pixels){
         memcpy(pixels_, pixels, newSize);
     }

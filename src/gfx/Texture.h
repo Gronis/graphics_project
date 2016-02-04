@@ -10,7 +10,13 @@ class Texture {
  public:
   Texture(const Bitmap &bitmap,
           GLint minMagFiler = GL_LINEAR,
-          GLint wrapMode = GL_CLAMP_TO_EDGE);
+          GLint wrapMode = GL_WRAP_BORDER);
+
+  Texture();
+
+  //enable move
+  Texture(Texture&&);
+  Texture& operator=(Texture&&);
 
   ~Texture();
 
@@ -20,7 +26,7 @@ class Texture {
   GLfloat height() const;
 
  private:
-  GLuint ref_;
+  GLuint ref_ = 0;
   GLfloat width_;
   GLfloat height_;
   static GLuint active_texture_unit_;

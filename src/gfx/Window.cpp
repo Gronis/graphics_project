@@ -3,6 +3,7 @@
 
 #include "Window.h"
 #include "Engine.h"
+#include "Components.h"
 #include "gfx/Texture.h"
 
 using namespace engine::gfx;
@@ -65,16 +66,17 @@ void Window::update(double dt) {
   handle_input();
   camera(glm::lookAt(camera_position_, camera_position_ + camera_direction_, glm::vec3(0, 1, 0)));
 }
-void Window::render(double dt, std::vector<Model> &models, std::vector<Renderer> &renderers) {
+void Window::render(double dt, ecs::EntityManager& entities, std::vector<Renderer> &renderers) {
   glClearColor(0, 0, 0, 1); // black
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   //Render renderers
   for (auto &&renderer : renderers) {
     renderer.use();
-    for (auto &&model : models) {
-      renderer.render(dt, *this, model);
-    }
+    entities.with([&](Position& pos, Rotation& rot, Scale& sca, Model& model){
+      renderer.render(dt, *this, pos, rot, sca, model);
+
+    });
     renderer.stopUsing();
   }
 

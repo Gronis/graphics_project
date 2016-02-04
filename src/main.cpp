@@ -1,42 +1,87 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
+#include "thirdparty/ecs.h"
 #include "Engine.h"
 #include "Resource.h"
+#include "Components.h"
 #include "gfx/Shader.h"
 #include "gfx/Texture.h"
 #include "gfx/Window.h"
-#include "gfx/Model.h"
 
-#include "thirdparty/tiny_obj_loader.h"
+
 
 using namespace engine;
 using namespace engine::gfx;
 using namespace engine::util;
+
+using namespace ecs;
 
 void OnError(int errorCode, const char *msg) {
   throw std::runtime_error(msg);
 }
 
 int main() {
+  EntityManager entities;
   Window window("graphics_project", 1280, 720);
   Resource resource;
   ShaderProgram program({resource.load<Shader>("res/vertex-shader.vert"),
                          resource.load<Shader>("res/fragment-shader.frag")});
-  Texture texture(resource.load<Bitmap>("res/wooden-crate.jpg"));
   std::vector<Renderer> renderers = { Renderer(program) };
 
-  Model model = resource.load<Model>("res/crytek-sponza/sponza.obj");
-  Model model2 = resource.load<Model>("res/crytek-sponza/banner.obj");
-  model.genVertexArrayObject(program);
-  model2.genVertexArrayObject(program);
-  std::vector<Model> models = { model };
+  auto e = entities.create<Renderable>(glm::vec3(3000,0,0),
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(50,50,50),
+                                  resource.load<Model>("res/sibenik/sibenik2.obj"));
+  e.get<Model>().genVertexArrayObject(program);
 
-  Engine engine([&window, &models, &renderers](float dt) {
+  e = entities.create<Renderable>(glm::vec3(0,0,0),
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(50,50,50),
+                                  resource.load<Model>("res/dabrovic-sponza/sponza2.obj"));
+  e.get<Model>().genVertexArrayObject(program);
+
+  e = entities.create<Renderable>(glm::vec3(-150,80,0),
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(50,50,50),
+                                  resource.load<Model>("res/box.obj"));
+  e.get<Model>().genVertexArrayObject(program);
+  e.add<RotationVelocity>(0,1,0);
+
+  /*
+  e = entities.create<Renderable>(glm::vec3(0,0,0),
+                                       glm::vec3(0,0,0),
+                                       glm::vec3(1,1,1),
+                                       resource.load<Model>("res/crytek-sponza/sponza.obj"));
+  e.get<Model>().genVertexArrayObject(program);
+
+
+
+
+  e = entities.create<Renderable>(glm::vec3(3200,150,0),
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(100,100,100),
+                                  resource.load<Model>("res/dragon2.obj"));
+  e.get<Model>().genVertexArrayObject(program);
+  e.add<RotationVelocity>(0,1,0);
+*/
+  e = entities.create<Renderable>(glm::vec3(0,0,0),
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(50,50,50),
+                                  resource.load<Model>("res/mitsuba/mitsuba-sphere.obj"));
+  e.get<Model>().genVertexArrayObject(program);
+  e.add<RotationVelocity>(0,1,0);
+
+  Engine engine([&](float dt) {
+    entities.with([&](RotationVelocity& vel, Rotation& rot){
+      rot += vel * dt;
+    });
     window.update(dt);
-    window.render(dt, models, renderers);
+    window.render(dt, entities, renderers);
     return !window.closed();
   });
+
+  e.add<Texture>(resource.load<Bitmap>("res/wooden-crate.jpg"));
 
 
   // print out some info about the graphics drivers
