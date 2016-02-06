@@ -7,6 +7,7 @@
 
 #include "util/Manager.h"
 #include "Renderer.h"
+#include "Gbuffer.h"
 
 namespace engine {
 namespace gfx {
@@ -19,7 +20,7 @@ class Window {
 
   void close();
   void update(double dt);
-  void render(double dt, ecs::EntityManager& entities, std::vector<Renderer> &renderers);
+  void swap_buffers();
 
   inline int x() { return x_; }
   inline int y() { return y_; }
@@ -32,6 +33,7 @@ class Window {
   inline void camera(glm::mat4 camera) { camera_ = camera; }
   inline glm::mat4 projection() { return projection_; }
   inline void projection(glm::mat4 projection) { projection_ = projection; }
+  inline Gbuffer& gbuffer() { return gbuffer_; }
 
  private:
 
@@ -64,6 +66,8 @@ class Window {
 
   glm::mat4 camera_;
   glm::mat4 projection_;
+  Gbuffer gbuffer_;
+
 
   GLFWwindow *window_;
 };

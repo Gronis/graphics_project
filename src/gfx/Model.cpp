@@ -107,7 +107,7 @@ void Model::genVertexArrayObject(ShaderProgram &program) {
     glVertexAttribPointer(program.attrib("vertTexCoord"),
                           2,
                           GL_FLOAT,
-                          GL_TRUE,
+                          GL_FALSE,
                           8 * sizeof(GLfloat),
                           (const GLvoid *) (3 * sizeof(GLfloat)));
 
@@ -115,7 +115,7 @@ void Model::genVertexArrayObject(ShaderProgram &program) {
     glVertexAttribPointer(program.attrib("vertNormal"),
                           3,
                           GL_FLOAT,
-                          GL_TRUE,
+                          GL_FALSE,
                           8 * sizeof(GLfloat),
                           (const GLvoid *) (5 * sizeof(GLfloat)));
 

@@ -1,12 +1,10 @@
-#version 150
-uniform mat4 projection;
-uniform mat4 camera;
+#version 330
 uniform mat4 modelViewProj;
 uniform mat4 modelViewNormal;
 
-in vec3 vert;
-in vec2 vertTexCoord;
-in vec3 vertNormal;
+layout (location = 0) in vec3 vert;
+layout (location = 1) in vec2 vertTexCoord;
+layout (location = 2) in vec3 vertNormal;
 
 out vec3 fragNormal;
 out vec2 fragTexCoord;

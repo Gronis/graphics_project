@@ -68,20 +68,7 @@ void Window::update(double dt) {
   handle_input(dt);
   camera(glm::lookAt(camera_position_, camera_position_ + camera_direction_, glm::vec3(0, 1, 0)));
 }
-void Window::render(double dt, ecs::EntityManager& entities, std::vector<Renderer> &renderers) {
-  glClearColor(0, 0, 0, 1); // black
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  //Render renderers
-  for (auto &&renderer : renderers) {
-    renderer.use();
-    entities.with([&](Position& pos, Rotation& rot, Scale& sca, Model& model){
-      renderer.render(dt, *this, pos, rot, sca, model);
-
-    });
-    renderer.stopUsing();
-  }
-
+void Window::swap_buffers(){
   glfwSwapBuffers(window_);
 }
 
@@ -93,6 +80,9 @@ void Window::resize(int width, int height) {
   width_ = width;
   height_ = height;
   projection(glm::perspective(glm::radians(50.0f), ((float) width_) / ((float) height_), 10.0f, 10000.0f));
+  int fb_width, fb_height;
+  glfwGetFramebufferSize(window_, &fb_width, &fb_height);
+  gbuffer_.init((unsigned int)fb_width, (unsigned int)fb_height);
 }
 
 void Window::focus_(GLFWwindow *window, int focused) {
@@ -142,14 +132,13 @@ void Window::handle_input(float dt) {
                                                          (float)((y_pos - y_pos_last_) * M_PI/1000), y_rotation_axis)
                                                           * glm::vec4(camera_direction_pref, 0);
     camera_direction_pref = glm::vec3(res.x, res.y, res.z);
-    camera_direction_ = camera_direction_ * DIR_BLEND + (1 - DIR_BLEND) * camera_direction_pref;
   }
-  camera_direction_ = glm::normalize(camera_direction_);
-  if(camera_direction_.y >  0.8f)  camera_direction_.y =  0.8f;
-  if(camera_direction_.y < -0.8f)  camera_direction_.y = -0.8f;
-  camera_direction_ = glm::normalize(camera_direction_);
+  camera_direction_pref = glm::normalize(camera_direction_pref);
+  if(camera_direction_pref.y >  0.9f)  camera_direction_pref.y =  0.9f;
+  if(camera_direction_pref.y < -0.9f)  camera_direction_pref.y = -0.9f;
   x_pos_last_ = x_pos;
   y_pos_last_ = y_pos;
+  camera_direction_ = camera_direction_ * DIR_BLEND + (1 - DIR_BLEND) * camera_direction_pref;
   if (glfwWindowShouldClose(window_)) {
     closed_ = true;
   }
