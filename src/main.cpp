@@ -139,11 +139,20 @@ int main() {
   e.get<Model>().genVertexArrayObject(geometry_shader_program);
   e.add<RotationVelocity>(0,1,0);
 
+  auto skybox = entities.create<Renderable>(glm::vec3(0,0,0),
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(5000,5000,5000),
+                                  resource.load<Model>("res/skybox.obj"));
+  skybox.get<Model>().genVertexArrayObject(geometry_shader_program);
+  skybox.add<RotationVelocity>(0,0.01f,0);
+
+
   Engine engine([&](float dt) {
     entities.with([&](RotationVelocity& vel, Rotation& rot){
       rot += vel * dt;
     });
     window.update(dt);
+    skybox.set<Position>(window.camera_position());
 
     //Render
     window.gbuffer().bind_write();

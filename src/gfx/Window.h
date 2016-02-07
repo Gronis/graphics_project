@@ -31,6 +31,7 @@ class Window {
   inline bool focused() { return focused_; }
   inline glm::mat4 camera() { return camera_; }
   inline void camera(glm::mat4 camera) { camera_ = camera; }
+  inline glm::vec3 camera_position() { return camera_position_; }
   inline glm::mat4 projection() { return projection_; }
   inline void projection(glm::mat4 projection) { projection_ = projection; }
   inline Gbuffer& gbuffer() { return gbuffer_; }

@@ -25,7 +25,7 @@ void main() {
     fragmentColor = vec4(pbs_components, 1.0);
 	fragmentColor = vec4(texture(frameBufferBaseColor, fragCoord_0_1).xyz, 1.0);
 	fragmentColor = vec4(vec3(depth, depth, depth) *
-	                    texture(frameBufferNormal, fragCoord_0_1).xyz *
+	                    //etexture(frameBufferNormal, fragCoord_0_1).xyz *
 	                    texture(frameBufferBaseColor, fragCoord_0_1).xyz *
 	                    pbs_components, 1.0);
 }
