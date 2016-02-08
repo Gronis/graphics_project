@@ -35,7 +35,7 @@ bool Gbuffer::init(unsigned int WindowWidth, unsigned int WindowHeight)
     glBindTexture(GL_TEXTURE_2D, m_textures[i]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, CHANNELS[i], WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, CHANNELS[i], WindowWidth /*/ 2*/, WindowHeight /*/ 2*/, 0, GL_RGB, GL_FLOAT, NULL);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);
   }
 
@@ -52,7 +52,7 @@ bool Gbuffer::init(unsigned int WindowWidth, unsigned int WindowHeight)
   glBindTexture(GL_TEXTURE_2D, m_depthTexture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, WindowWidth /*/ 2*/, WindowHeight /*/ 2*/, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
                NULL);
   glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
 

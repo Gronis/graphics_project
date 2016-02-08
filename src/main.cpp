@@ -47,9 +47,17 @@ void render_model(Window&         window,
   glm::mat4 modelViewProj = projMat * viewMat * modelMat;
   glm::vec2 uv_scale = entity.has<UVScale>()? entity.get<UVScale>().value : glm::vec2(1,1);
 
+  Material m;
+  if(entity.has<Material>()){
+    m = entity.get<Material>();
+  }else{
+    m = Material{glm::vec3(1,1,1), 1.0f, 1.0f, 1.0f};
+  }
+
   program.setUniform("modelViewProj", modelViewProj);
   program.setUniform("modelViewNormal", glm::transpose(glm::inverse(viewMat * modelMat)));
   program.setUniform("uv_scale", uv_scale);
+  program.setUniform("modelColor", m.color);
 
   for (int i = 0; i < model.getNumOfShapes(); ++i) {
     //Texture
@@ -133,25 +141,32 @@ int main() {
                                   resource.load<Model>("res/dabrovic-sponza/sponza.obj"));
   e.get<Model>().genVertexArrayObject(geometry_shader_program);
 
+
   e = entities.create<Renderable>(glm::vec3(-150,80,0),
                                   glm::vec3(0,0,0),
                                   glm::vec3(50,50,50),
                                   resource.load<Model>("res/box.obj"));
   e.get<Model>().genVertexArrayObject(geometry_shader_program);
   e.add<RotationVelocity>(0,1,0);
+  e.add<Material>(glm::vec3(0.5f,0.8,1), 1.0f, 1.0f, 1.0f);
 
   e = entities.create<Renderable>(glm::vec3(0,0,0),
                                   glm::vec3(0,0,0),
-                                  glm::vec3(500,5,500),
+                                  glm::vec3(800,5,800),
                                   resource.load<Model>("res/box.obj"));
   e.get<Model>().genVertexArrayObject(geometry_shader_program);
-  e.add<UVScale>(glm::vec2(4,4));
+  e.add<UVScale>(glm::vec2(6,6));
 
-  e = entities.create<Renderable>(glm::vec3(0,70,0),
-                                  glm::vec3(0,0,0),
-                                  glm::vec3(50,50,50),
-                                  resource.load<Model>("res/material_model.obj"));
-  e.get<Model>().genVertexArrayObject(geometry_shader_program);
+  for (int i = 0; i < 5; ++i) {
+    for (int j = 0; j < 5; ++j) {
+      e = entities.create<Renderable>(glm::vec3(120 * i,70, 120 * j),
+                                      glm::vec3(0,0,0),
+                                      glm::vec3(50,50,50),
+                                      resource.load<Model>("res/material_model.obj"));
+      e.get<Model>().genVertexArrayObject(geometry_shader_program);
+      e.add<Material>(glm::vec3(0.2 * i, 0.2 * j, 1 - 0.1 * i - 0.1 * j), 1.0f, 1.0f, 1.0f);
+    }
+  }
   //e.add<UVScale>(glm::vec2(0.5,0.5));
 
 
@@ -176,6 +191,7 @@ int main() {
 
     glClearColor(0, 0, 0, 1); // black
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glViewport(0,0,window.width(), window.height());
 
     entities.with([&](Position& pos, Rotation& rot, Scale& sca, Model& model, Entity e){
       render_model(window, geometry_shader_program, pos, rot, sca, model, e);
@@ -184,6 +200,7 @@ int main() {
 
 
     //Post Processing
+    //glViewport(0,0,window.width() * 2, window.height() * 2);
     deferred_shader_program.use();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     //glClearColor(0.0, 0.0, 0.0, 1.0);

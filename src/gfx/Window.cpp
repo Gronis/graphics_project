@@ -47,6 +47,8 @@ Window::Window(const char *title, int width, int height, bool use_virtual_sync, 
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
 
   camera_position_ = camera_position_pref = glm::vec3(190, 100, 0);
   camera_direction_ = camera_direction_pref = glm::vec3(0, 0, 1);

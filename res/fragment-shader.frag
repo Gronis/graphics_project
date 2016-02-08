@@ -4,6 +4,7 @@ uniform sampler2D diffuse_tex; //this is the texture
 
 in vec2 fragTexCoord; //this is the texture coord
 in vec3 fragNormal;
+in vec3 fragColor;
 //out vec4 finalColor; //this is the output color of the pixel
 
 layout (location = 0) out vec3 base_color;
@@ -20,7 +21,7 @@ void main() {
     float specular = 0.5f;
     float roughness = 1.0f;
 
-    base_color = sample.rgb;
+    base_color = sample.rgb * fragColor;
     pbs = vec3(metallic, specular, roughness);
     normal = fragNormal;
 
