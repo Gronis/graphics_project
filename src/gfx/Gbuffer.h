@@ -24,9 +24,9 @@ class Gbuffer {
 
   bool init(unsigned int WindowWidth, unsigned int WindowHeight);
 
-  void bind_write();
+  void bind_geometry_stage();
 
-  void bind_read();
+  void bind_lighting_stage();
 
   void set_read_buffer(GBUFFER_TEXTURE_TYPE TextureType);
 

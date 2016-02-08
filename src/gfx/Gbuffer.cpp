@@ -40,15 +40,6 @@ bool Gbuffer::init(unsigned int WindowWidth, unsigned int WindowHeight)
   }
 
   // depth
-  /*
-  glGenRenderbuffers(1, &m_dbo);
-  glBindRenderbuffer(GL_RENDERBUFFER, m_dbo);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight);
-  // Associate our created depth buffer with the FBO
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER, m_dbo);
-  */
-
   glBindTexture(GL_TEXTURE_2D, m_depthTexture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -84,7 +75,7 @@ Gbuffer::~Gbuffer() {
 
 }
 
-void Gbuffer::bind_read() {
+void Gbuffer::bind_lighting_stage() {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   for (unsigned int i = 0 ; i < GBUFFER_NUM_TEXTURES; i++) {
     glActiveTexture(GL_TEXTURE0 + i);
@@ -95,7 +86,7 @@ void Gbuffer::bind_read() {
   glBindTexture(GL_TEXTURE_2D, m_depthTexture);
 }
 
-void Gbuffer::bind_write() {
+void Gbuffer::bind_geometry_stage() {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 }
 

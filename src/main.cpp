@@ -23,10 +23,6 @@ void OnError(int errorCode, const char *msg) {
   throw std::runtime_error(msg);
 }
 
-GLuint frameBuffer;
-GLuint depthBuffer;
-
-
 void render_model(Window&         window,
                   ShaderProgram&  program,
                   glm::vec3 &     pos,
@@ -126,6 +122,9 @@ int main() {
   ShaderProgram geometry_shader_program({resource.load<Shader>("res/vertex-shader.vert"),
                                          resource.load<Shader>("res/fragment-shader.frag")});
 
+  //ShaderProgram ssao_shader_program({resource.load<Shader>("res/ssao-shading.vert"),
+  //                                       resource.load<Shader>("res/ssao-shading.frag")});
+
   ShaderProgram deferred_shader_program({resource.load<Shader>("res/deferred-shading.vert"),
                                          resource.load<Shader>("res/deferred-shading.frag")});
 
@@ -186,7 +185,7 @@ int main() {
     skybox.set<Position>(window.camera_position());
 
     //Render
-    window.gbuffer().bind_write();
+    window.gbuffer().bind_geometry_stage();
     geometry_shader_program.use();
 
     glClearColor(0, 0, 0, 1); // black
@@ -208,7 +207,12 @@ int main() {
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    window.gbuffer().bind_read();
+    //calculate inverse matrix from projection to recreate camera projection
+    glm::mat4 proj = window.projection();
+
+    window.gbuffer().bind_lighting_stage();
+    deferred_shader_program.setUniform("projInverse", glm::inverse(proj));
+    //deferred_shader_program.setUniform("proj", proj);
     deferred_shader_program.setUniform("frameBufferBaseColor", 0);
     deferred_shader_program.setUniform("frameBufferPBS", 1);
     deferred_shader_program.setUniform("frameBufferNormal", 2);
