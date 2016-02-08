@@ -115,6 +115,8 @@ void drawFullScreenQuad()
 }
 
 
+
+
 int main() {
   EntityManager entities;
   Window window("graphics_project", 960, 540);
@@ -159,7 +161,7 @@ int main() {
   for (int i = 0; i < 5; ++i) {
     for (int j = 0; j < 5; ++j) {
       e = entities.create<Renderable>(glm::vec3(120 * i,70, 120 * j),
-                                      glm::vec3(0,0,0),
+                                      glm::vec3(0,M_PI,0),
                                       glm::vec3(50,50,50),
                                       resource.load<Model>("res/material_model.obj"));
       e.get<Model>().genVertexArrayObject(geometry_shader_program);

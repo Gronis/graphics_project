@@ -6,7 +6,7 @@
 // required by GLSL spec Sect 4.5.3 (though nvidia does not, amd does)
 //precision highp float;
 
-float radius = 0.007f;
+float radius = 0.01f;
 
 in vec2 fragCoord_0_1; //from 0 to 1
 in vec2 fragCoord_m1_1; //from -1 to 1 use later to recreate position with inverse matrix
@@ -54,21 +54,14 @@ void main() {
     occluded_inverse -= ambient_occlution(vec3(-0.2f, -0.3f, 0.6f), tbn, position, depth);
     occluded_inverse -= ambient_occlution(vec3(-0.3f,  0.2f, 0.2f), tbn, position, depth);
 
-    occluded_inverse -= ambient_occlution(vec3( 0.0f,  0.8f, 0.2f), tbn, position, depth);
-    occluded_inverse -= ambient_occlution(vec3( 0.9f, -0.8f, 0.3f), tbn, position, depth);
-    occluded_inverse -= ambient_occlution(vec3(-0.0f, -0.7f, 0.2f), tbn, position, depth);
-    occluded_inverse -= ambient_occlution(vec3(-0.7f,  0.7f, 0.5f), tbn, position, depth);
-    occluded_inverse -= ambient_occlution(vec3( 0.4f,  0.2f, 0.4f), tbn, position, depth);
-    occluded_inverse -= ambient_occlution(vec3( 0.6f, -0.3f, 0.2f), tbn, position, depth);
-    occluded_inverse -= ambient_occlution(vec3(-0.2f, -0.8f, 0.1f), tbn, position, depth);
-    occluded_inverse -= ambient_occlution(vec3(-0.6f,  0.2f, 0.2f), tbn, position, depth);
+
 
 	fragmentColor = vec4(texture(frameBufferNormal, fragCoord_0_1).xyz, 1.0);
     fragmentColor = vec4(pbs_components, 1.0);
 	fragmentColor = vec4(texture(frameBufferBaseColor, fragCoord_0_1).xyz, 1.0);
 	fragmentColor = vec4(vec3(occluded_inverse, occluded_inverse, occluded_inverse)
 	                    //* fake_lighting
-	                    //* texture(frameBufferBaseColor, fragCoord_0_1).xyz
+	                    * texture(frameBufferBaseColor, fragCoord_0_1).xyz
 	                    //* pbs_components
 	                    , 1.0);
 }
@@ -94,7 +87,7 @@ float ambient_occlution(vec3 rvec, mat3 tbn, vec3 position, float depth){
 
     // range check & accumulate:
    float rangeCheck= abs(depth - sampleDepth) < (1 - depth) * 0.08f ? 1.0 : 0.0;
-   return (sampleDepth < depth ? 0.0625 : 0.0) * rangeCheck;
+   return (sampleDepth < depth ? 0.125 /*0.0625*/ : 0.0) * rangeCheck;
 
 /*
     // get sample position:
