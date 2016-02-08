@@ -20,12 +20,13 @@ void main() {
     float metallic = pbs_components.x;
     float specular = pbs_components.y;
     float roughness = pbs_components.z;
-    float depth = texture(frameBufferDepth, fragCoord_0_1).x * 10 - 9;
+    float depth = 1 - (pow(texture(frameBufferDepth, fragCoord_0_1).x, 15)) * 0;
 	fragmentColor = vec4(texture(frameBufferNormal, fragCoord_0_1).xyz, 1.0);
     fragmentColor = vec4(pbs_components, 1.0);
 	fragmentColor = vec4(texture(frameBufferBaseColor, fragCoord_0_1).xyz, 1.0);
-	fragmentColor = vec4(vec3(depth, depth, depth) *
-	                    //etexture(frameBufferNormal, fragCoord_0_1).xyz *
-	                    texture(frameBufferBaseColor, fragCoord_0_1).xyz *
-	                    pbs_components, 1.0);
+	fragmentColor = vec4(vec3(depth, depth, depth)
+	                    //* texture(frameBufferNormal, fragCoord_0_1).xyz
+	                    * texture(frameBufferBaseColor, fragCoord_0_1).xyz
+	                    //* pbs_components
+	                    , 1.0);
 }

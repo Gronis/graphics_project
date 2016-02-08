@@ -20,7 +20,7 @@ void main() {
     float specular = 0.5f;
     float roughness = 1.0f;
 
-    base_color = sample.xyz;
+    base_color = sample.rgb;
     pbs = vec3(metallic, specular, roughness);
     normal = fragNormal;
 

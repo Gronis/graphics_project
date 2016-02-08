@@ -12,6 +12,7 @@ namespace engine{
   struct Position : ecs::Property<glm::vec3> {};
   struct Rotation : ecs::Property<glm::vec3> {};
   struct Scale    : ecs::Property<glm::vec3> {};
+  struct UVScale  : ecs::Property<glm::vec2> {};
 
   struct RotationVelocity : ecs::Property<glm::vec3> {
     RotationVelocity(float x, float y, float z) : ecs::Property<glm::vec3>(glm::vec3(x,y,z)){}

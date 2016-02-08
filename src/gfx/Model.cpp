@@ -76,13 +76,13 @@ void Model::genVertexArrayObject(ShaderProgram &program) {
       vbd[j * 8    ] = m.positions[j * 3    ];
       vbd[j * 8 + 1] = m.positions[j * 3 + 1];
       vbd[j * 8 + 2] = m.positions[j * 3 + 2];
+      vbd[j * 8 + 3] = m.normals  [j * 3    ];
+      vbd[j * 8 + 4] = m.normals  [j * 3 + 1];
+      vbd[j * 8 + 5] = m.normals  [j * 3 + 2];
       if(m.texcoords.size() > 0){
-        vbd[j * 8 + 3] = m.texcoords[j * 2    ];
-        vbd[j * 8 + 4] = m.texcoords[j * 2 + 1];
+        vbd[j * 8 + 6] = (GLfloat) m.texcoords[j * 2    ];
+        vbd[j * 8 + 7] = (GLfloat) m.texcoords[j * 2 + 1];
       }
-      vbd[j * 8 + 5] = m.normals  [j * 3    ];
-      vbd[j * 8 + 6] = m.normals  [j * 3 + 1];
-      vbd[j * 8 + 7] = m.normals  [j * 3 + 2];
     }
     // make and bind the VAO
     GLuint vao;
@@ -100,16 +100,8 @@ void Model::genVertexArrayObject(ShaderProgram &program) {
 
     // connect the xyz to the "vert" attribute of the vertex shader
     glEnableVertexAttribArray(program.attrib("vert"));
-    glVertexAttribPointer(program.attrib("vert"), 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), NULL);
+    glVertexAttribPointer(program.attrib("vert"), 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), 0);
     // Bind our third VBO as being the active buffer and storing vertex array indicies
-
-    glEnableVertexAttribArray(program.attrib("vertTexCoord"));
-    glVertexAttribPointer(program.attrib("vertTexCoord"),
-                          2,
-                          GL_FLOAT,
-                          GL_FALSE,
-                          8 * sizeof(GLfloat),
-                          (const GLvoid *) (3 * sizeof(GLfloat)));
 
     glEnableVertexAttribArray(program.attrib("vertNormal"));
     glVertexAttribPointer(program.attrib("vertNormal"),
@@ -117,7 +109,16 @@ void Model::genVertexArrayObject(ShaderProgram &program) {
                           GL_FLOAT,
                           GL_FALSE,
                           8 * sizeof(GLfloat),
-                          (const GLvoid *) (5 * sizeof(GLfloat)));
+                          (const GLvoid *) (3 * sizeof(GLfloat)));
+
+    glEnableVertexAttribArray(program.attrib("vertTexCoord"));
+    glVertexAttribPointer(program.attrib("vertTexCoord"),
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          8 * sizeof(GLfloat),
+                          (const GLvoid *) (6 * sizeof(GLfloat)));
+
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo);

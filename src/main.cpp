@@ -27,7 +27,13 @@ GLuint frameBuffer;
 GLuint depthBuffer;
 
 
-void render_model(Window &window, ShaderProgram& program, glm::vec3 &pos, glm::vec3 &rot, glm::vec3 &sca, Model &model) {
+void render_model(Window&         window,
+                  ShaderProgram&  program,
+                  glm::vec3 &     pos,
+                  glm::vec3 &     rot,
+                  glm::vec3 &     sca,
+                  Model &         model,
+                  Entity          entity) {
 //  program_.setUniform("camera", window.camera());
 //  program_.setUniform("projection", window.projection());
 
@@ -39,9 +45,11 @@ void render_model(Window &window, ShaderProgram& program, glm::vec3 &pos, glm::v
   auto projMat = window.projection();
 
   glm::mat4 modelViewProj = projMat * viewMat * modelMat;
+  glm::vec2 uv_scale = entity.has<UVScale>()? entity.get<UVScale>().value : glm::vec2(1,1);
 
   program.setUniform("modelViewProj", modelViewProj);
   program.setUniform("modelViewNormal", glm::transpose(glm::inverse(viewMat * modelMat)));
+  program.setUniform("uv_scale", uv_scale);
 
   for (int i = 0; i < model.getNumOfShapes(); ++i) {
     //Texture
@@ -119,10 +127,10 @@ int main() {
                                   resource.load<Model>("res/sibenik/sibenik2.obj"));
   e.get<Model>().genVertexArrayObject(geometry_shader_program);
 
-  e = entities.create<Renderable>(glm::vec3(0,0,0),
+  e = entities.create<Renderable>(glm::vec3(-3000,0,0),
                                   glm::vec3(0,0,0),
                                   glm::vec3(50,50,50),
-                                  resource.load<Model>("res/dabrovic-sponza/sponza2.obj"));
+                                  resource.load<Model>("res/dabrovic-sponza/sponza.obj"));
   e.get<Model>().genVertexArrayObject(geometry_shader_program);
 
   e = entities.create<Renderable>(glm::vec3(-150,80,0),
@@ -134,10 +142,18 @@ int main() {
 
   e = entities.create<Renderable>(glm::vec3(0,0,0),
                                   glm::vec3(0,0,0),
-                                  glm::vec3(50,50,50),
-                                  resource.load<Model>("res/mitsuba/mitsuba-sphere.obj"));
+                                  glm::vec3(500,5,500),
+                                  resource.load<Model>("res/box.obj"));
   e.get<Model>().genVertexArrayObject(geometry_shader_program);
-  e.add<RotationVelocity>(0,1,0);
+  e.add<UVScale>(glm::vec2(4,4));
+
+  e = entities.create<Renderable>(glm::vec3(0,70,0),
+                                  glm::vec3(0,0,0),
+                                  glm::vec3(50,50,50),
+                                  resource.load<Model>("res/material_model.obj"));
+  e.get<Model>().genVertexArrayObject(geometry_shader_program);
+  //e.add<UVScale>(glm::vec2(0.5,0.5));
+
 
   auto skybox = entities.create<Renderable>(glm::vec3(0,0,0),
                                   glm::vec3(0,0,0),
@@ -161,8 +177,8 @@ int main() {
     glClearColor(0, 0, 0, 1); // black
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    entities.with([&](Position& pos, Rotation& rot, Scale& sca, Model& model){
-      render_model(window, geometry_shader_program, pos, rot, sca, model);
+    entities.with([&](Position& pos, Rotation& rot, Scale& sca, Model& model, Entity e){
+      render_model(window, geometry_shader_program, pos, rot, sca, model, e);
     });
     geometry_shader_program.stopUsing();
 
@@ -170,8 +186,10 @@ int main() {
     //Post Processing
     deferred_shader_program.use();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     window.gbuffer().bind_read();
     deferred_shader_program.setUniform("frameBufferBaseColor", 0);
@@ -180,6 +198,8 @@ int main() {
     deferred_shader_program.setUniform("frameBufferDepth", 3);
     drawFullScreenQuad();
     deferred_shader_program.stopUsing();
+
+    glDisable(GL_BLEND);
 
     window.swap_buffers();
 
